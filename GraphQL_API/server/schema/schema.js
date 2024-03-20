@@ -36,7 +36,7 @@ const TaskType = new GraphQLObjectType({
             type: ProjectType,
             resolve(parent, args) {
                 // Find the project by ID using lodash
-                return _.find(projects, { id: parent.projectId });
+                return _.find(Project, { id: parent.projectId });
             }
         }
     })
@@ -54,7 +54,7 @@ const ProjectType = new GraphQLObjectType({
             type: new GraphQLList(TaskType),
             resolve(parent, args) {
                 // Filter tasks by projectId
-                return _.filter(task, { projectId: parent.id });
+                return _.filter(Task, { projectId: parent.id });
             }
         }
     })
@@ -72,7 +72,7 @@ const RootQueryType = new GraphQLObjectType({
             },
             resolve(parent, args) {
                 // Find the task by ID using lodash
-                return _.find(tasks, { id: args.id });
+                return _.find(Task, { id: args.id });
             }
         },
         // project field
@@ -91,7 +91,7 @@ const RootQueryType = new GraphQLObjectType({
             type: new GraphQLList(TaskType),
             resolve(parent, args) {
                 // Return all tasks
-                return tasks;
+                return Task;
             }
         },
         // all projects field
@@ -99,7 +99,7 @@ const RootQueryType = new GraphQLObjectType({
             type: new GraphQLList(ProjectType),
             resolve(parent, args) {
                 // Return all projects
-                return projects;
+                return Project;
             }
         }
     }
@@ -124,7 +124,7 @@ const Mutation = new GraphQLObjectType({
                   weight: args.weight,
                   description: args.description
                 });
-                return project.save();
+                return Project.save();
               }
         },
         // add task
@@ -143,7 +143,7 @@ const Mutation = new GraphQLObjectType({
                   description: args.description,
                   projectId: args.projectId
                 });
-                return task.save();
+                return Task.save();
             }
         }
     }
