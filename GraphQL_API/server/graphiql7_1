@@ -1,0 +1,11 @@
+mutation {
+  addProject(
+    title: "Bootstrap",
+    weight: 1,
+    description: "Bootstrap description test"
+  ) {
+    title
+    weight
+    description
+  }
+}

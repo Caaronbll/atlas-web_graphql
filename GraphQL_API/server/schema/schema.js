@@ -1,9 +1,13 @@
 // imports
-const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema, GraphQLID, GraphQLList } = require('graphql');
+const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema, GraphQLID, GraphQLList, GraphQLNonNull } = require('graphql');
 const _ = require('lodash');
 
-/*   Dummy DATA   */
+// importing models
+const Project = require('../models/project');
+const Task = require('../models/task');
 
+/*   Dummy DATA   */
+/*
 // tasks data
 const tasks = [
     { projectId: '1', id: '1', title: 'Create your first webpage', weight: 1, description: 'Create your first HTML file 0-index.html with: -Add the doctype on the first line (without any comment) -After the doctype, open and close a html tag Open your file in your browser (the page should be blank)' },
@@ -11,10 +15,12 @@ const tasks = [
 ];
 
 // projects data
+
 const projects = [
     { id: '1', title: 'Advanced HTML', weight: 1, description: 'Welcome to the Web Stack specialization. The 3 first projects will give you all basics of the Web development: HTML, CSS and Developer tools. In this project, you will learn how to use HTML tags to structure a web page. No CSS, no styling - don’t worry, the final page will be “ugly” it’s normal, it’s not the purpose of this project. Important note: details are important! lowercase vs uppercase / wrong letter… be careful!' },
     { id: '2', title: 'Bootstrap', weight: 1, description: 'Bootstrap is a free and open-source CSS framework directed at responsive, mobile-first front-end web development. It contains CSS and JavaScript design templates for typography, forms, buttons, navigation, and other interface components.' }
 ];
+*/
 
 /*     TYPES    */
 
@@ -48,7 +54,7 @@ const ProjectType = new GraphQLObjectType({
             type: new GraphQLList(TaskType),
             resolve(parent, args) {
                 // Filter tasks by projectId
-                return _.filter(tasks, { projectId: parent.id });
+                return _.filter(task, { projectId: parent.id });
             }
         }
     })
@@ -99,7 +105,53 @@ const RootQueryType = new GraphQLObjectType({
     }
 });
 
+/*     Mutations    */
+
+const Mutation = new GraphQLObjectType({
+    name: 'Mutation',
+    fields: {
+        // add project
+        addProject: {
+            type: ProjectType,
+            args: {
+                title: { type: new GraphQLNonNull(GraphQLString) },
+                weight: { type: new GraphQLNonNull(GraphQLInt) },
+                description: { type: new GraphQLNonNull(GraphQLString) }
+              },
+              resolve(parent, args) {
+                let project = new Project({
+                  title: args.title,
+                  weight: args.weight,
+                  description: args.description
+                });
+                return project.save();
+              }
+        },
+        // add task
+        addTask: {
+            type: TaskType,
+            args: {
+              title: { type: new GraphQLNonNull(GraphQLString) },
+              weight: { type: new GraphQLNonNull(GraphQLInt) },
+              description: { type: new GraphQLNonNull(GraphQLString) },
+              projectId: { type: new GraphQLNonNull(GraphQLID) }
+            },
+            resolve(parent, args) {
+                let task = new Task({
+                  title: args.title,
+                  weight: args.weight,
+                  description: args.description,
+                  projectId: args.projectId
+                });
+                return task.save();
+            }
+        }
+    }
+});
+
+
 // Exporting RootQueryType
 module.exports = new GraphQLSchema({
-    query: RootQueryType
+    query: RootQueryType,
+    mutation: Mutation
 });

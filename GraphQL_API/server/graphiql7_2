@@ -1,0 +1,12 @@
+mutation {
+  addTask(
+    title: "Reboot Styling",
+    weight: 2,
+    description: "Reboot Styling description test",
+    projectId: "2"
+  ) {
+    title
+    weight
+    description
+  }
+}
